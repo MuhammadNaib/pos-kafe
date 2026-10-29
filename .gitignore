@@ -1,0 +1,5 @@
+# Library hasil npm install
+node_modules/
+
+# File rahasia (password database, API key)
+.env
