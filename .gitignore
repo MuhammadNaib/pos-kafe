@@ -3,3 +3,4 @@ node_modules/
 
 # File rahasia (password database, API key)
 .env
+.env.test
