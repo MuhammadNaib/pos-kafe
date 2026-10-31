@@ -4,3 +4,6 @@ node_modules/
 # File rahasia (password database, API key)
 .env
 .env.test
+
+# Foto yang diunggah (data, bukan kode)
+server/uploads/
