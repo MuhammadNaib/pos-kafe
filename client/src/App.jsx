@@ -1,6 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router';
 import AppLayout from './components/layout/AppLayout.jsx';
 import PlaceholderPage from './pages/PlaceholderPage.jsx';
+import CategoriesPage from './pages/CategoriesPage.jsx';
 
 export default function App() {
   return (
@@ -12,7 +13,7 @@ export default function App() {
         <Route path="riwayat" element={<PlaceholderPage title="Riwayat transaksi" />} />
         <Route path="dashboard" element={<PlaceholderPage title="Dashboard" />} />
         <Route path="menu" element={<PlaceholderPage title="Kelola menu" />} />
-        <Route path="kategori" element={<PlaceholderPage title="Kelola kategori" />} />
+        <Route path="kategori" element={<CategoriesPage />} />
         <Route path="meja" element={<PlaceholderPage title="Kelola meja" />} />
         <Route path="user" element={<PlaceholderPage title="Kelola user" />} />
       </Route>

@@ -25,3 +25,8 @@
 body {
   @apply bg-latar font-sans text-kopi-900 antialiased;
 }
+
+:focus-visible {
+  outline: 2px solid var(--color-jeruk-500);
+  outline-offset: 2px;
+}
