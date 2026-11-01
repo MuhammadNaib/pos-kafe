@@ -1,0 +1,27 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  --color-jeruk-50: #fff4ec;
+  --color-jeruk-100: #ffe4d1;
+  --color-jeruk-500: #f46a1f;
+  --color-jeruk-600: #dc5712;
+
+  --color-kopi-900: #2a1f1a;
+  --color-kopi-600: #6f625a;
+  --color-kopi-400: #a3968d;
+
+  --color-latar: #fffaf6;
+  --color-garis: #f1e6dc;
+
+  --color-pastel-hijau: #e9f4e6;
+  --color-pastel-persik: #fdeedf;
+  --color-pastel-merah: #fde7e4;
+  --color-pastel-ungu: #efeafb;
+  --color-pastel-kuning: #fbf3d6;
+}
+
+body {
+  @apply bg-latar font-sans text-kopi-900 antialiased;
+}
