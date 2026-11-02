@@ -1,4 +1,5 @@
 import prisma from '../src/lib/prisma.js';
+import { hashPassword } from '../src/utils/password.js';
 
 const categories = [
     {
@@ -43,6 +44,22 @@ async function main() {
             },
         });
     }
+
+    const { SEED_ADMIN_EMAIL, SEED_ADMIN_PASSWORD } = process.env;
+
+    if (!SEED_ADMIN_EMAIL || !SEED_ADMIN_PASSWORD) {
+        throw new Error('Isi SEED_ADMIN_EMAIL dan SEED_ADMIN_PASSWORD di file .env');
+    }
+
+    await prisma.user.deleteMany();
+    await prisma.user.create({
+        data: {
+            name: 'Pemilik Kafe',
+            email: SEED_ADMIN_EMAIL.trim().toLowerCase(),
+            password: await hashPassword(SEED_ADMIN_PASSWORD),
+            role: 'ADMIN',
+        },
+    });
 
     console.log(`Seed selesai: ${categories.length} kategori dibuat.`);
 }

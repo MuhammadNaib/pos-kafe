@@ -8,6 +8,7 @@ if (!process.env.DATABASE_URL?.includes('pos_kafe_test')) {
 beforeEach(async () => {
     await prisma.menu.deleteMany();
     await prisma.category.deleteMany();
+    await prisma.user.deleteMany();
 });
 
 afterAll(async () => {
