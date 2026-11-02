@@ -20,3 +20,17 @@ export async function api(path, options = {}) {
 
     return data;
 }
+
+export async function uploadImage(file) {
+    const formData = new FormData();
+    formData.append('image', file);
+
+    const response = await fetch('/api/uploads', { method: 'POST', body: formData });
+    const data = await response.json();
+
+    if (!response.ok) {
+        throw new Error(data.message ?? 'Upload gambar gagal');
+    }
+
+    return data.url;
+}
