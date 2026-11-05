@@ -29,3 +29,12 @@ export async function requireAuth(req, res, next) {
     req.user = publicUser;
     next();
 }
+
+export function requireRole(...roles) {
+    return (req, res, next) => {
+        if (!roles.includes(req.user.role)) {
+            throw new HttpError(403, 'Anda tidak memiliki akses ke fitur ini');
+        }
+        next();
+    };
+}

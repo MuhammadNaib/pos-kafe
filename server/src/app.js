@@ -6,6 +6,7 @@ import menuRoutes from './modules/menus/menu.routes.js';
 import uploadRoutes, { UPLOAD_DIR } from './modules/uploads/upload.routes.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './modules/auth/auth.routes.js';
+import { requireAuth, requireRole } from './middlewares/auth.js';
 
 const app = express();
 
@@ -18,10 +19,9 @@ app.get('/api/health', (req, res) => {
 });
 
 app.use('/api/auth', authRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/categories', categoryRoutes);
-app.use('/api/menus', menuRoutes);
-app.use('/api/uploads', uploadRoutes);
+app.use('/api/categories', requireAuth, categoryRoutes);
+app.use('/api/menus', requireAuth, menuRoutes);
+app.use('/api/uploads', requireAuth, requireRole('ADMIN'), uploadRoutes);
 app.use('/uploads', express.static(UPLOAD_DIR));
 
 app.use((req, res, next) => {
