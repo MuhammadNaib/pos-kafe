@@ -7,6 +7,7 @@ import uploadRoutes, { UPLOAD_DIR } from './modules/uploads/upload.routes.js';
 import cookieParser from 'cookie-parser';
 import authRoutes from './modules/auth/auth.routes.js';
 import { requireAuth, requireRole } from './middlewares/auth.js';
+import userRoutes from './modules/users/user.routes.js';
 
 const app = express();
 
@@ -23,6 +24,8 @@ app.use('/api/categories', requireAuth, categoryRoutes);
 app.use('/api/menus', requireAuth, menuRoutes);
 app.use('/api/uploads', requireAuth, requireRole('ADMIN'), uploadRoutes);
 app.use('/uploads', express.static(UPLOAD_DIR));
+app.use('/api/uploads', requireAuth, requireRole('ADMIN'), uploadRoutes);
+app.use('/api/users', requireAuth, requireRole('ADMIN'), userRoutes);
 
 app.use((req, res, next) => {
     next(new HttpError(404, 'Rute tidak ditemukan'));
