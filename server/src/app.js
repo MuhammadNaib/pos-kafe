@@ -4,15 +4,21 @@ import errorHandler from './middlewares/errorHandler.js';
 import categoryRoutes from './modules/categories/category.routes.js';
 import menuRoutes from './modules/menus/menu.routes.js';
 import uploadRoutes, { UPLOAD_DIR } from './modules/uploads/upload.routes.js';
+import cookieParser from 'cookie-parser';
+import authRoutes from './modules/auth/auth.routes.js';
 
 const app = express();
 
 app.use(express.json());
+app.use(express.json());
+app.use(cookieParser());
 
 app.get('/api/health', (req, res) => {
     res.json({ status: 'ok' });
 });
 
+app.use('/api/auth', authRoutes);
+app.use('/api/categories', categoryRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/menus', menuRoutes);
 app.use('/api/uploads', uploadRoutes);
