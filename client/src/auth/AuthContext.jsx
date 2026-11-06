@@ -38,7 +38,13 @@ export function AuthProvider({ children }) {
     setStatus('guest');
   }
 
-  return <AuthContext value={{ user, status, login, logout }}>{children}</AuthContext>;
+    async function muatUlangSaya() {
+    setUser(await api('/auth/me'));
+  }
+
+    return (
+    <AuthContext value={{ user, status, login, logout, muatUlangSaya }}>{children}</AuthContext>
+  );
 }
 
 export function useAuth() {

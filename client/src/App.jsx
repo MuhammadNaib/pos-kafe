@@ -5,6 +5,7 @@ import LoginPage from './pages/LoginPage.jsx';
 import PlaceholderPage from './pages/PlaceholderPage.jsx';
 import CategoriesPage from './pages/CategoriesPage.jsx';
 import MenusPage from './pages/MenusPage.jsx';
+import UsersPage from './pages/UsersPage.jsx';
 
 export default function App() {
   return (
@@ -23,7 +24,7 @@ export default function App() {
             <Route path="menu" element={<MenusPage />} />
             <Route path="kategori" element={<CategoriesPage />} />
             <Route path="meja" element={<PlaceholderPage title="Kelola meja" />} />
-            <Route path="user" element={<PlaceholderPage title="Kelola user" />} />
+            <Route path="user" element={<UsersPage />} />
           </Route>
         </Route>
       </Route>
