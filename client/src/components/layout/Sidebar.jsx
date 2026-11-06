@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router';
+import { useAuth } from '../../auth/AuthContext.jsx';
 import {
   Coffee,
   LayoutDashboard,
@@ -44,6 +45,9 @@ function ItemNavigasi({ to, label, icon: Icon }) {
 }
 
 export default function Sidebar() {
+  const { user } = useAuth();
+  const isAdmin = user.role === 'ADMIN';
+
   return (
     <aside className="flex w-60 shrink-0 flex-col border-r border-garis bg-white px-4 py-6">
       <div className="mb-8 flex items-center gap-2.5 px-2">
@@ -59,12 +63,16 @@ export default function Sidebar() {
         ))}
       </nav>
 
-      <p className="mt-8 mb-2 px-3 text-xs font-semibold text-kopi-400">Kelola</p>
-      <nav className="flex flex-col gap-1">
-        {MENU_ADMIN.map((item) => (
-          <ItemNavigasi key={item.to} {...item} />
-        ))}
-      </nav>
+      {isAdmin && (
+        <>
+          <p className="mt-8 mb-2 px-3 text-xs font-semibold text-kopi-400">Kelola</p>
+          <nav className="flex flex-col gap-1">
+            {MENU_ADMIN.map((item) => (
+              <ItemNavigasi key={item.to} {...item} />
+            ))}
+          </nav>
+        </>
+      )}
     </aside>
   );
 }
