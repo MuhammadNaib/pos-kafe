@@ -138,3 +138,116 @@ describe('POST /api/orders', () => {
         expect(res.status).toBe(401);
     });
 });
+
+describe('GET /api/orders', () => {
+    it('kasir hanya melihat pesanannya sendiri, terbaru lebih dulu', async () => {
+        const admin = await loginAs('ADMIN');
+        const pertama = await pesanTunai([{ menuId: americano.id, quantity: 1 }]);
+        await admin
+            .post('/api/orders')
+            .send({ items: [{ menuId: kopiSusu.id, quantity: 1 }], paymentMethod: 'CASH', cashPaid: 50000 });
+        const kedua = await pesanTunai([{ menuId: kopiSusu.id, quantity: 2 }]);
+
+        const res = await kasir.get('/api/orders');
+
+        expect(res.status).toBe(200);
+        expect(res.body.map((order) => order.id)).toEqual([kedua.body.id, pertama.body.id]);
+    });
+
+    it('admin melihat pesanan semua kasir', async () => {
+        const admin = await loginAs('ADMIN');
+        await pesanTunai([{ menuId: americano.id, quantity: 1 }]);
+        await admin
+            .post('/api/orders')
+            .send({ items: [{ menuId: kopiSusu.id, quantity: 1 }], paymentMethod: 'CASH', cashPaid: 50000 });
+
+        const res = await admin.get('/api/orders');
+
+        expect(res.body.map((order) => order.cashier.name).sort()).toEqual(['Admin Tes', 'Kasir Tes']);
+    });
+
+    it('menampilkan ringkasan setiap pesanan', async () => {
+        const dibuat = await pesanTunai([
+            { menuId: americano.id, quantity: 2 },
+            { menuId: kopiSusu.id, quantity: 1 },
+        ]);
+
+        const res = await kasir.get('/api/orders');
+
+        expect(res.body).toEqual([
+            {
+                id: dibuat.body.id,
+                code: dibuat.body.code,
+                total: 58000,
+                paymentMethod: 'CASH',
+                paymentStatus: 'PAID',
+                status: 'PENDING',
+                createdAt: expect.any(String),
+                cashier: { id: expect.any(Number), name: 'Kasir Tes' },
+                itemCount: 3,
+            },
+        ]);
+    });
+
+    it('menyaring berdasarkan rentang waktu', async () => {
+        const lama = await pesanTunai([{ menuId: americano.id, quantity: 1 }]);
+        const baru = await pesanTunai([{ menuId: kopiSusu.id, quantity: 1 }]);
+        await prisma.order.update({
+            where: { id: lama.body.id },
+            data: { createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000) },
+        });
+
+        const res = await kasir.get('/api/orders').query({
+            from: new Date(Date.now() - 60 * 60 * 1000).toISOString(),
+            to: new Date(Date.now() + 60 * 1000).toISOString(),
+        });
+
+        expect(res.body.map((order) => order.id)).toEqual([baru.body.id]);
+    });
+
+    it('menolak rentang tanggal yang tidak valid', async () => {
+        const res = await kasir.get('/api/orders').query({ from: 'abc' });
+
+        expect(res.status).toBe(400);
+        expect(res.body).toEqual({ message: 'Rentang tanggal tidak valid' });
+    });
+});
+
+describe('GET /api/orders/:id', () => {
+    it('mengembalikan detail pesanan, sama dengan saat dibuat', async () => {
+        const dibuat = await pesanTunai([{ menuId: americano.id, quantity: 2 }]);
+
+        const res = await kasir.get(`/api/orders/${dibuat.body.id}`);
+
+        expect(res.status).toBe(200);
+        expect(res.body).toEqual(dibuat.body);
+    });
+
+    it('admin bisa membuka pesanan kasir mana pun', async () => {
+        const admin = await loginAs('ADMIN');
+        const dibuat = await pesanTunai([{ menuId: americano.id, quantity: 1 }]);
+
+        const res = await admin.get(`/api/orders/${dibuat.body.id}`);
+
+        expect(res.status).toBe(200);
+    });
+
+    it('kasir tidak bisa membuka pesanan kasir lain', async () => {
+        const admin = await loginAs('ADMIN');
+        const milikAdmin = await admin
+            .post('/api/orders')
+            .send({ items: [{ menuId: americano.id, quantity: 1 }], paymentMethod: 'CASH', cashPaid: 50000 });
+
+        const res = await kasir.get(`/api/orders/${milikAdmin.body.id}`);
+
+        expect(res.status).toBe(404);
+        expect(res.body).toEqual({ message: 'Pesanan tidak ditemukan' });
+    });
+
+    it('mengembalikan 404 untuk pesanan yang tidak ada', async () => {
+        const res = await kasir.get('/api/orders/999999');
+
+        expect(res.status).toBe(404);
+        expect(res.body).toEqual({ message: 'Pesanan tidak ditemukan' });
+    });
+});

@@ -95,3 +95,54 @@ export async function createCashOrder({ items, cashPaid }, cashierId) {
     });
   });
 }
+
+export async function listOrders({ from, to, user }) {
+  const where = {};
+
+  if (user.role !== 'ADMIN') {
+    where.cashierId = user.id;
+  }
+
+  if (from || to) {
+    where.createdAt = {};
+    if (from) where.createdAt.gte = from;
+    if (to) where.createdAt.lte = to;
+  }
+
+  const orders = await prisma.order.findMany({
+    where,
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    select: {
+      id: true,
+      code: true,
+      total: true,
+      paymentMethod: true,
+      paymentStatus: true,
+      status: true,
+      createdAt: true,
+      cashier: { select: { id: true, name: true } },
+      items: { select: { quantity: true } },
+    },
+  });
+
+  return orders.map(({ items, ...order }) => ({
+    ...order,
+    itemCount: items.reduce((jumlah, item) => jumlah + item.quantity, 0),
+  }));
+}
+
+export async function getOrder(id, user) {
+  const where = { id };
+
+  if (user.role !== 'ADMIN') {
+    where.cashierId = user.id;
+  }
+
+  const order = await prisma.order.findFirst({ where, select: orderSelect });
+
+  if (!order) {
+    throw new HttpError(404, 'Pesanan tidak ditemukan');
+  }
+
+  return order;
+}
