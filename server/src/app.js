@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import authRoutes from './modules/auth/auth.routes.js';
 import { requireAuth, requireRole } from './middlewares/auth.js';
 import userRoutes from './modules/users/user.routes.js';
+import orderRoutes from './modules/orders/order.routes.js';
 
 const app = express();
 
@@ -26,6 +27,7 @@ app.use('/api/uploads', requireAuth, requireRole('ADMIN'), uploadRoutes);
 app.use('/uploads', express.static(UPLOAD_DIR));
 app.use('/api/uploads', requireAuth, requireRole('ADMIN'), uploadRoutes);
 app.use('/api/users', requireAuth, requireRole('ADMIN'), userRoutes);
+app.use('/api/orders', requireAuth, orderRoutes);
 
 app.use((req, res, next) => {
     next(new HttpError(404, 'Rute tidak ditemukan'));
