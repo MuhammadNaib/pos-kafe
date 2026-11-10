@@ -9,6 +9,7 @@ export default function Modal({ open, title, onClose, children, size = 'max-w-md
 
     if (open && !dialog.open) {
       dialog.showModal();
+      dialog.querySelector('[data-autofocus]')?.focus();
     }
 
     if (!open && dialog.open) {

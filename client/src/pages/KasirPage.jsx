@@ -2,10 +2,14 @@ import { useEffect, useReducer, useState } from 'react';
 import { useSearchParams } from 'react-router';
 import toast from 'react-hot-toast';
 import { api } from '../lib/api.js';
-import { cartReducer } from '../lib/cart.js';
+import { cartReducer, hitungTotal } from '../lib/cart.js';
 import CategoryTabs from '../components/kasir/CategoryTabs.jsx';
 import MenuCard from '../components/kasir/MenuCard.jsx';
 import CartPanel from '../components/kasir/CartPanel.jsx';
+import CashPaymentModal from '../components/kasir/CashPaymentModal.jsx';
+import Modal from '../components/ui/Modal.jsx';
+import ReceiptModal from '../components/orders/ReceiptModal.jsx';
+
 
 export default function KasirPage() {
   const [menus, setMenus] = useState([]);
@@ -15,6 +19,8 @@ export default function KasirPage() {
   const [keranjang, dispatch] = useReducer(cartReducer, []);
   const [searchParams] = useSearchParams();
   const kataKunci = (searchParams.get('q') ?? '').trim();
+  const [bayarTerbuka, setBayarTerbuka] = useState(false);
+    const [struk, setStruk] = useState(null);
 
   async function muatData() {
     try {
@@ -36,6 +42,22 @@ export default function KasirPage() {
     (menu) =>
       (kategori === '' || menu.category.id === kategori) && menu.name.toLowerCase().includes(kataKunci.toLowerCase()),
   );
+
+    async function bayarTunai(cashPaid) {
+    const order = await api('/orders', {
+      method: 'POST',
+      body: {
+        items: keranjang.map((item) => ({ menuId: item.menuId, quantity: item.quantity })),
+        paymentMethod: 'CASH',
+        cashPaid,
+      },
+    });
+
+    dispatch({ type: 'kosongkan' });
+    setBayarTerbuka(false);
+    setStruk(order);
+    toast.success(`Pesanan ${order.code} lunas`);
+  }
 
   function jumlahDiKeranjang(menuId) {
     return keranjang.find((item) => item.menuId === menuId)?.quantity ?? 0;
@@ -99,7 +121,17 @@ export default function KasirPage() {
         </div>
       </section>
 
-      <CartPanel items={keranjang} dispatch={dispatch} onBayar={() => toast('Pembayaran tunai dibuat di Task 5')} />
+      <CartPanel items={keranjang} dispatch={dispatch} onBayar={() => setBayarTerbuka(true)} />
+
+      <Modal open={bayarTerbuka} title="Bayar tunai" onClose={() => setBayarTerbuka(false)}>
+        <CashPaymentModal
+          total={hitungTotal(keranjang)}
+          onSubmit={bayarTunai}
+          onCancel={() => setBayarTerbuka(false)}
+        />
+      </Modal>
+
+      <ReceiptModal order={struk} onClose={() => setStruk(null)} closeLabel="Pesanan baru" />
     </div>
   );
 }

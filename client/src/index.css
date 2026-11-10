@@ -30,3 +30,52 @@ body {
   outline: 2px solid var(--color-jeruk-500);
   outline-offset: 2px;
 }
+
+@media print {
+  @page {
+    size: 58mm auto;
+    margin: 0;
+  }
+
+  body {
+    background: white;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  dialog:has(.area-cetak) {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 58mm;
+    max-width: none;
+    max-height: none;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+    border-radius: 0;
+    background: none;
+    box-shadow: none;
+  }
+
+  dialog::backdrop {
+    background: transparent;
+  }
+
+  .area-cetak,
+  .area-cetak * {
+    visibility: visible;
+  }
+
+  .area-cetak {
+    position: absolute;
+    top: 0;
+    left: 0;
+    padding: 0;
+    border-radius: 0;
+    background: white;
+    box-shadow: none;
+  }
+}
