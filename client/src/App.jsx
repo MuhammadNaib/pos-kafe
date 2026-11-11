@@ -7,6 +7,7 @@ import CategoriesPage from './pages/CategoriesPage.jsx';
 import MenusPage from './pages/MenusPage.jsx';
 import UsersPage from './pages/UsersPage.jsx';
 import KasirPage from './pages/KasirPage.jsx';
+import RiwayatPage from './pages/RiwayatPage.jsx';
 
 export default function App() {
   return (
@@ -18,7 +19,7 @@ export default function App() {
           <Route index element={<Navigate to="/kasir" replace />} />
           <Route path="kasir" element={<KasirPage />} />
           <Route path="pesanan" element={<PlaceholderPage title="Pesanan aktif" />} />
-          <Route path="riwayat" element={<PlaceholderPage title="Riwayat transaksi" />} />
+          <Route path="riwayat" element={<RiwayatPage />} />
 
           <Route element={<RequireAuth roles={['ADMIN']} />}>
             <Route path="dashboard" element={<PlaceholderPage title="Dashboard" />} />
