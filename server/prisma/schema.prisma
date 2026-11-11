@@ -68,6 +68,9 @@ model Order {
     total         Int
     cashPaid      Int?
     change        Int?
+    paymentRef    String?       @unique
+    qrUrl         String?
+    expiresAt     DateTime?
     cashierId     Int
     cashier       User          @relation(fields: [cashierId], references: [id])
     items         OrderItem[]
